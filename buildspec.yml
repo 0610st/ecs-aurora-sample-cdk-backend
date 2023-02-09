@@ -7,22 +7,20 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - $(aws ecr get-login --no-include-email --region ap-northeast-1)
+      - $(aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com)
   build:
     commands:
       - echo Build started on `date`
-      - npm install
-      - npm run build
-      - docker build -t nestjs-test .
-      - docker tag nestjs-test 152341231368.dkr.ecr.ap-northeast-1.amazonaws.com/nestjs-test:latest
+      - docker build -t $ECR_REPO_NAME .
+      - docker tag $ECR_REPO_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION/$ECR_REPO_NAME:latest
       - cd $CODEBUILD_SRC_DIR
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push 152341231368.dkr.ecr.ap-northeast-1.amazonaws.com/nestjs-test:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:latest
       - echo Writing image definitions file...
-      - printf '[{"name":"nestjs-test","imageUri":"%s"}]' 152341231368.dkr.ecr.ap-northeast-1.amazonaws.com/nestjs-test > imagedefinitions.json
+      - printf '[{"name":"nestjs-test","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME > imagedefinitions.json
 
 artifacts:
   files:
