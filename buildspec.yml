@@ -19,7 +19,7 @@ phases:
       - echo Pushing the Docker images...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:latest
       - echo Writing image definitions file...
-      - printf '[{"name":"nestjs-test","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME > imagedefinitions.json
+      - printf '[{"name":"web","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME > imagedefinitions.json
 
 artifacts:
   files:
