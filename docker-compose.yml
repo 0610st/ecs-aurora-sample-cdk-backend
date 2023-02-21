@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  api:
+    container_name: nest_api
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    volumes:
+      - ./prisma:/usr/src/app/prisma
+      - ./src:/usr/src/app/src
+    depends_on:
+      - db
+    command: npm run start:dev
+  db:
+    image: postgres:14
+    container_name: db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: postgres
+    volumes:
+      - ./db:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - 8888:80
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hogehoge@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    depends_on:
+      - db
