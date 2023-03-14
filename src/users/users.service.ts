@@ -14,8 +14,7 @@ export class UsersService {
   async createUser(data: CreateUserDto): Promise<UserResultObject> {
     const { username, email, password } = data;
 
-    const salt = await bcrypt.genSalt(SALT_ROUNDS);
-    const hashPassword = await bcrypt.hash(password, salt);
+    const hashPassword = await this.hashPassword(password);
     const userData = {
       username,
       email,
@@ -45,7 +44,7 @@ export class UsersService {
       throw new HttpException({ errors }, 401);
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await this.comparePassword(password, user.password);
 
     if (!isMatch) {
       throw new HttpException({ errors }, 401);
@@ -57,5 +56,17 @@ export class UsersService {
         username: user.username,
       },
     };
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(SALT_ROUNDS);
+    return await bcrypt.hash(password, salt);
+  }
+
+  private async comparePassword(
+    plainPassword: string,
+    hashPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(hashPassword, plainPassword);
   }
 }
